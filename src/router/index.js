@@ -1,29 +1,48 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Layout from "@/views/Layout";
 
-Vue.use(VueRouter)
+// 异步导入组件
+const Recommend = () => import("@/views/Recommend");
+const Hot = () => import("@/views/Hot");
+const Search = () => import("@/views/Search");
+
+Vue.use(VueRouter);
 
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
-]
+	// layout框架路由
+	{
+		path: "/",
+		name: "layout",
+		component: Layout,
+		redirect: "/recommend",
+		children: [
+			// 推荐音乐
+			{
+				path: "recommend",
+				name: "recommend",
+				component: Recommend,
+			},
+			// 热歌榜
+			{
+				path: "hot",
+				name: "hot",
+				component: Hot,
+			},
+			// 搜索
+			{
+				path: "search",
+				name: "search",
+				component: Search,
+			},
+		],
+	},
+];
 
 const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
-})
+	mode: "history",
+	base: process.env.BASE_URL,
+	routes,
+});
 
-export default router
+export default router;
