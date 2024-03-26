@@ -1,34 +1,29 @@
 <template>
 	<div class="container">
-		<h2 class="remd_tl">编辑推荐</h2>
+		<TitleH2 content="编辑推荐" />
+		<EditorialRecommendation style="padding-bottom: 24px" />
+		<TitleH2 content="最新音乐" />
+		<NewSongList />
 	</div>
 </template>
 
 <script>
-	export default {};
+	import TitleH2 from "./TitleH2.vue";
+	import EditorialRecommendation from "./EditorialRecommendation.vue";
+	import NewSongList from "./NewSongList.vue";
+
+	export default {
+		components: { TitleH2, EditorialRecommendation, NewSongList },
+		data() {
+			return {};
+		},
+	};
 </script>
 
 <style lang="less" scoped>
 	.container {
 		padding-top: 20px;
-		.remd_tl {
-			position: relative;
-			padding-left: 9px;
-			margin-bottom: 14px;
-			font-size: 17px;
-			height: 20px;
-			line-height: 20px;
-
-			&::after {
-				content: " ";
-				position: absolute;
-				left: 0;
-				top: 50%;
-				margin-top: -9px;
-				width: 2px;
-				height: 16px;
-				background-color: #d33a31;
-			}
-		}
+		height: 2000px;
+		// background: wheat;
 	}
 </style>

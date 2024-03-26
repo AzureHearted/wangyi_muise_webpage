@@ -1,35 +1,77 @@
 <template>
 	<div class="container">
 		<!-- 顶部区域 -->
-		<div class="top-bar">
-			<!-- 图片 -->
-			<img src="@/assets/images/logo.jpg" alt="" srcset="" />
-			<!-- 导航栏 -->
+		<div class="top-bar" ref="topBar">
+			<!-- 下载引导 -->
+			<TopDownload v-if="showTopDownload" @close="showTopDownload = false" />
+			<!-- 导航标签 -->
 			<van-tabs
+				class="tabs"
 				v-model="active"
-				sticky
+				swipeable
+				line-width="70px"
+				line-height="2px"
 				title-inactive-color="#333"
 				title-active-color="#DD001B">
 				<van-tab
 					title="推荐音乐"
 					:to="{ name: 'recommend' }"
-					name="recomment" />
+					name="recommend" />
 				<van-tab title="热歌榜" :to="{ name: 'hot' }" name="hot" />
 				<van-tab title="搜索" :to="{ name: 'search' }" name="search" />
 			</van-tabs>
 		</div>
-		<div class="wrapper">
-			<router-view />
+		<!-- 内容区 -->
+		<div class="wrapper" :style="wrapper.style">
+			<keep-alive>
+				<router-view />
+			</keep-alive>
 		</div>
 	</div>
 </template>
 
 <script>
+	import TopDownload from "@/views/Layout/TopDownload"; // 导入顶部下载引导组件
+
 	export default {
+		components: { TopDownload },
 		data() {
 			return {
 				active: "recommend",
+				showTopDownload: true, // 用于判断是否显示顶部下载引导组件
+				wrapper: {
+					style: {
+						paddingTop: 0 + "px",
+					},
+				},
 			};
+		},
+		watch: {
+			// 监听showTopDownload
+			showTopDownload(val, oldVal) {
+				if (val !== oldVal) {
+					// 发生变化重新设置wrapper的padding-top
+					this.setWrapperPaddingTop();
+				}
+			},
+		},
+		created() {
+			this.setWrapperPaddingTop();
+			// 设置激活的标签
+			this.active = this.$route.name;
+		},
+		methods: {
+			/** 设置wrapper容器的padding-top */
+			setWrapperPaddingTop() {
+				// 获取wrapper的padding-top
+				this.$nextTick(() => {
+					let { offsetHeight: topBarHeight } = this.$refs.topBar;
+					// console.log("created(nexTick) —— topBar的高度", topBarHeight);
+					// 根据topBar的高度的设置内容区的padding-top
+					this.wrapper.style.paddingTop = topBarHeight + "px";
+					this.$route.path;
+				});
+			},
 		},
 	};
 </script>
@@ -37,18 +79,29 @@
 <style lang="less" scoped>
 	.container {
 		.top-bar {
+			position: fixed;
+			width: 100%;
 			top: 0;
-			position: sticky;
+			z-index: 5;
 			// background: orange;
-			background: transparent;
-			img {
-				width: 100%;
-				vertical-align: top; // 消除img标签下方的空隙
+			// background: blue;
+			// background: transparent;
+			.tabs {
+				/deep/.van-tabs__wrap {
+					height: 40px;
+					border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+					.van-tab__text {
+						font-size: 15px;
+					}
+					// 修正激活时的标题字体
+					.van-tab--active {
+						font-weight: normal;
+					}
+				}
 			}
-			border-bottom: 1px solid rgb(204, 204, 204);
 		}
 		.wrapper {
-			// padding: 10px;
+			padding-top: 124px;
 			// background: rgb(5, 106, 126);
 			// background: bisque;
 		}
