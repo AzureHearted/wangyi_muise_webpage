@@ -11,6 +11,8 @@ import {
 	List,
 	Cell,
 	CellGroup,
+	Search,
+	Tag,
 } from "vant"; // 导入要使用到的vant组件
 
 Vue.use(Button);
@@ -23,3 +25,5 @@ Vue.use(GridItem);
 Vue.use(List);
 Vue.use(Cell);
 Vue.use(CellGroup);
+Vue.use(Search);
+Vue.use(Tag);

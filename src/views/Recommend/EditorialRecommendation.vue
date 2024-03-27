@@ -1,12 +1,15 @@
 <template>
 	<div class="remd_ul">
 		<div class="remd_li" v-for="(item, index) in list" :key="index">
+			<!-- 音乐封面 -->
 			<div class="remd_img">
 				<img class="u-img" :src="item.picUrl" />
+				<!-- 播放量 & 耳机图标 -->
 				<span class="u-earp remd_lnum"
 					>{{ item.playCount | countFormat }}
 				</span>
 			</div>
+			<!-- 描述 -->
 			<p class="remd_text">{{ item.name }}</p>
 		</div>
 	</div>
@@ -16,25 +19,27 @@
 	import { formatNumber } from "@/utils/common";
 	/** 数据结构定义
 	 * @typedef {object} Data
-	 * @property {number} id
-	 * @property {string} name
-	 * @property {string} picUrl
-	 * @property {number} playCount
+	 * @property {number} id id
+	 * @property {string} name 名称
+	 * @property {string} picUrl 图片路径
+	 * @property {number} playCount 播放量
 	 */
 	export default {
-		created() {
-			this.getList();
-		},
 		filters: {
-			/** 格式化数量 */
+			/**  格式化数量
+			 * @param {number} value
+			 */
 			countFormat(value) {
 				return formatNumber(value, 1);
 			},
 		},
+		created() {
+			this.getList();
+		},
 		methods: {
 			async getList() {
 				let res = await this.$api.recommendedMusic({ limit: 6 });
-				console.log(res.data);
+				console.log("编辑推荐", res.data);
 				if (res.data?.code === 200) {
 					this.list = res.data.result;
 				}
@@ -62,6 +67,7 @@
 			box-sizing: border-box;
 			text-align: center;
 			margin-bottom: 16px;
+			cursor: pointer;
 
 			// 卡片间隙样式
 			--gap: 2px;

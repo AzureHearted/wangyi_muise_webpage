@@ -6,7 +6,7 @@
 </template>
 
 <script>
-	import Logo from "@/components/logo";
+	import Logo from "@/components/logo.vue";
 	import downloadButton from "./download-button.vue";
 	export default {
 		components: { Logo, downloadButton },
@@ -21,9 +21,7 @@
 <style lang="less" scoped>
 	.topfix {
 		// position: fixed;
-		top: 0;
-		left: 0;
-		z-index: 100;
+		position: relative;
 		display: -webkit-box;
 		display: -webkit-flex;
 		display: -ms-flexbox;
@@ -37,9 +35,18 @@
 		-ms-flex-align: center;
 		align-items: center;
 		padding: 0 10px;
-		width: 100%;
-		height: 84px;
-		background-color: #d43c33;
-		box-sizing: border-box;
+		height: 83px;
+		left: 0;
+		right: 0;
+		z-index: 5;
+
+		// 遮罩背景
+		&::after {
+			content: "";
+			position: absolute;
+			background: #d43c33;
+			inset: 0;
+			z-index: -10000;
+		}
 	}
 </style>

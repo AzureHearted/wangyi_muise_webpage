@@ -13,6 +13,13 @@ module.exports = defineConfig({
 					"^/api": "",
 				},
 			},
+			"/wangYiApi": {
+				target: "https://interface.music.163.com",
+				changeOrigin: true,
+				pathRewrite: {
+					"^/wangYiApi": "",
+				},
+			},
 		},
 	},
 });
