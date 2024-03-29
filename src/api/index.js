@@ -14,7 +14,11 @@ const base = {
 	// 接口:热歌榜 (由于跨域,因此需要配置反向代理) wangYiApi
 	hotSinglesChart: host_wangYi + "/weapi/v6/playlist/detail",
 	// 接口:热搜
-	hotSearches: host_wangYi + "/weapi/search/hot",
+	hotSearches: host + "/search/hot",
+	// 接口:搜索建议
+	searchSuggest: host + "/search/suggest",
+	// 接口:搜索音乐
+	searchMusic: host + "/cloudsearch",
 };
 
 const api = {
@@ -55,19 +59,27 @@ const api = {
 	) {
 		return axios.post(base.hotSinglesChart, params);
 	},
-	/** 接口:热门搜索
+	/** 接口:热门搜索 */
+	hotSearches() {
+		return axios.get(base.hotSearches);
+	},
+	/** 接口:搜索建议
 	 * @param {object} params
-	 * @param {string} params.params
-	 * @param {string} params.encSecKey 加密密钥
+	 * @param {string} params.keywords 关键词
+	 * @param {'mobile'} [params.type] 类型
 	 */
-	hotSearches(
-		params = {
-			params: "vqjDMALLTtjzgCktB3jPnCJzm4fL9T4Q8f4/s1wN6X0=",
-			encSecKey:
-				"aa69b4749a801a1f133ddf69a8cd07350765a0b76c9441570026fbcd1f9d167e1e861a12600df8c324a5e408a5725adeb81500b3446a9adce8dc38e3d26bc5f46d0819fbe73f7d2f409737f7f98f1756b4d67ed5fccb28acfa3e9f621fc789f30b0a5c0d776e28655d4f8773ddd87e6e3177408f39fd34d52699a25aa052b40e",
-		}
-	) {
-		return axios.post(base.hotSearches, params);
+	searchSuggest(params) {
+		return axios.get(base.searchSuggest, { params });
+	},
+
+	/** 接口:搜索建议
+	 * @param {object} params
+	 * @param {string} params.keywords 关键词
+	 * @param {number} params.limit 请求结果数量(默认30)
+	 * @param {number} params.offset 偏移(用作分页)
+	 */
+	searchMusic(params) {
+		return axios.get(base.searchMusic, { params });
 	},
 };
 

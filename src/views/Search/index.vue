@@ -2,43 +2,55 @@
 	<div class="container">
 		<!-- 搜索框 -->
 		<van-search
+			ref="search"
 			v-focus
 			v-model="value"
 			shape="round"
 			autofocus
-			placeholder="搜索歌曲、歌手、专辑" />
+			placeholder="搜索歌曲、歌手、专辑"
+			@click="getSearchSuggest" />
 		<!-- 热门搜索 -->
-		<div class="hot-search">
-			<h3 class="label">热门搜索</h3>
-			<!-- 热门标签搜索列表 -->
-			<div class="list">
-				<van-tag
-					v-for="(item, index) in hotSearches"
-					:key="index"
-					text-color="#333"
-					plain
-					round
-					size="medium"
-					@click="handleSearch(item.first)"
-					type="danger">
-					{{ item.first }}
-				</van-tag>
-			</div>
-		</div>
-		<!-- 匹配结果展示 -->
-		<div class="match-result"></div>
+		<SearchHotList
+			v-show="!(showSearchResult || showSearchSuggest)"
+			@item-click="handleSearch" />
+		<!-- 搜索建议 -->
+		<SearchSuggest
+			ref="searchSuggest"
+			:keywords="value"
+			v-show="showSearchSuggest && !showSearchResult"
+			@to-search="handleSearch" />
 		<!-- 搜索结果展示 -->
-		<div class="search-result"></div>
+		<div class="search-result" v-show="showSearchResult">
+			<!-- 搜索结果列表 -->
+			<BaseList
+				:list="searchResult"
+				v-model="loading"
+				:finished="finished"
+				@load="handleSearch(value)">
+				<template slot="custom" slot-scope="{ item }">
+					<!-- 音乐项定义 -->
+					<MusicItem
+						:id="item.id"
+						:name="item.name"
+						:alias="item.alia"
+						:artists="item.ar"
+						:is-sq-music="!!item.sq" />
+				</template>
+			</BaseList>
+		</div>
 	</div>
 </template>
 
 <script>
-	/** 数据结构定义
-	 *  @typedef {object} Data
-	 *  @property {string} first
-	 */
+	import BaseList from "@/components/base-list.vue";
+	import MusicItem from "@/components/music-item.vue";
+	import SearchHotList from "./search-hot-list.vue";
+	import SearchSuggest from "./search-suggest.vue";
+
 	export default {
+		components: { SearchHotList, SearchSuggest, BaseList, MusicItem },
 		directives: {
+			// 自定义指令：自动获取焦点
 			focus: {
 				inserted(el) {
 					el.querySelector("input").focus();
@@ -48,34 +60,79 @@
 		},
 		data() {
 			return {
-				value: "",
-				hotSearches: [],
+				value: "", // 搜索框内容
+				searchResult: [], // 搜索结果
+				showSearchSuggest: false, // 是否显示搜索建议
+				// 搜索结果分页
+				showSearchResult: false, // 是否显示搜索结果
+				page: 1, // 当前页码
+				pageSize: 20, // 每页显示条数
+				total: 0, // 总条数
+				// 加载状态相关属性
+				loading: false, // 加载状态
+				finished: false, // 是否加载完成
 			};
 		},
-		created() {
-			this.getHotSearches();
-		},
-		methods: {
-			// 获取热门搜索
-			async getHotSearches() {
-				let res = await this.$api.hotSearches();
-				console.log("热门搜索", res.data);
-				if (res.data.code === 200) {
-					this.hotSearches = res.data.result?.hots;
-					// console.log(this.hotSearches);
+		watch: {
+			// 监听搜索框内容变化
+			value(newVal) {
+				if (newVal) {
+					this.showSearchSuggest = true;
+				} else {
+					// 如果搜索框内容为空，则隐藏搜索建议
+					this.showSearchSuggest = false;
+					this.showSearchResult = false;
+					// 重置搜索结果数据
+					this.resetSearchResult();
 				}
 			},
-			// 搜索
-			async handleSearch(keywords) {
-				this.value = keywords;
-			},
 		},
-		data() {
-			return {
-				value: "",
-				/** @type {Data[]} */
-				hotSearches: [],
-			};
+		created() {},
+		methods: {
+			// 获取搜索建议
+			async getSearchSuggest() {
+				this.showSearchResult = false; // 隐藏搜索结果列表
+				this.resetSearchResult(); // 重置搜索结果数据
+				this.$refs.searchSuggest.getSearchSuggest(); // 调用子组件方法
+			},
+			/** 搜索音乐
+			 * @param {string} keywords 关键词
+			 */
+			async handleSearch(keywords) {
+				this.loading = true;
+				// 判断搜索框内容是否为空
+				if (!keywords) return;
+				this.value = keywords;
+				this.showSearchResult = true;
+				console.log("加载搜索结果……");
+				// 发送请求
+				let res = await this.$api.searchMusic({
+					keywords,
+					limit: this.pageSize,
+					offset: this.searchResult.length,
+				});
+				console.log("搜索音乐", res.data);
+				// 判断是否成功
+				if (res.data.code === 200) {
+					this.searchResult.push(...res.data?.result?.songs);
+					this.total = res.data?.result?.songCount;
+					console.log(this.total, this.searchResult);
+					this.loading = false;
+					if (this.searchResult.length >= this.total) {
+						this.finished = true;
+					}
+				}
+			},
+			// 重置搜索结果
+			resetSearchResult() {
+				console.log("重置搜索结果");
+				// 重置数据
+				this.searchResult = [];
+				// 重置分页
+				this.page = 1;
+				this.total = 0;
+				this.finished = false;
+			},
 		},
 	};
 </script>
@@ -85,17 +142,6 @@
 	.van-search {
 		position: relative;
 		padding: 15px 10px;
-
-		&::after {
-			content: "";
-			position: absolute;
-			left: 0;
-			bottom: 0;
-			right: 0;
-
-			border: 0px solid rgba(0, 0, 0, 0.1);
-			border-bottom-width: 1px;
-		}
 		.van-search__content {
 			background: #ebecec;
 		}
@@ -115,48 +161,14 @@
 			margin: 0;
 		}
 	}
-	// 热门搜索
-	.hot-search {
-		padding: 15px 10px 0;
-		// 热门搜索标题
-		.label {
-			font-size: 12px;
-			line-height: 12px;
-			color: #666;
-		}
-		// 热门搜索列表
-		.list {
-			padding: 10px 0 7px;
+	.van-search::after {
+		content: "";
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		right: 0;
 
-			// 热门搜索标签
-			.van-tag {
-				height: 32px;
-				font-size: 14px;
-				line-height: 32px;
-				border-radius: 32px;
-				padding: 0 14px;
-				margin: 0 8px 8px 0;
-
-				cursor: pointer;
-
-				&::before {
-					position: absolute;
-					z-index: 2;
-					content: "";
-					top: 0;
-					left: 0;
-					pointer-events: none;
-					box-sizing: border-box;
-					width: 100%;
-					height: 100%;
-					-webkit-transform-origin: top left;
-					-ms-transform-origin: top left;
-					transform-origin: top left;
-					border: 0 solid rgba(0, 0, 0, 0.1);
-					border-radius: inherit;
-					border-width: 1px;
-				}
-			}
-		}
+		border: 0px solid rgba(0, 0, 0, 0.1);
+		border-bottom-width: 1px;
 	}
 </style>

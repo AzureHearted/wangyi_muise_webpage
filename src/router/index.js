@@ -1,11 +1,11 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Layout from "@/views/Layout";
+import Layout from "@/views/layout";
 
 // 异步导入组件
-const Recommend = () => import("@/views/Recommend");
-const Hot = () => import("@/views/Hot");
-const Search = () => import("@/views/Search");
+const Recommend = () => import("@/views/recommend");
+const Hots = () => import("@/views/hots");
+const Search = () => import("@/views/search");
 
 Vue.use(VueRouter);
 
@@ -19,19 +19,19 @@ const routes = [
 		children: [
 			// 推荐音乐
 			{
-				path: "recommend",
+				path: "/recommend",
 				name: "recommend",
 				component: Recommend,
 			},
 			// 热歌榜
 			{
-				path: "hot",
+				path: "/hot",
 				name: "hot",
-				component: Hot,
+				component: Hots,
 			},
 			// 搜索
 			{
-				path: "search",
+				path: "/search",
 				name: "search",
 				component: Search,
 			},

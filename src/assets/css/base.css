@@ -6,6 +6,7 @@
 body {
 	/* padding: 10px; */
 	font-family: unset;
+	background-color: rgb(251, 253, 253);
 }
 
 /* 基础样式 */
@@ -87,5 +88,3 @@ textarea {
 	color: #333;
 	outline: 0;
 }
-
-

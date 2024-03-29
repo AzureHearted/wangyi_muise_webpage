@@ -13,6 +13,7 @@ import {
 	CellGroup,
 	Search,
 	Tag,
+	Loading,
 } from "vant"; // 导入要使用到的vant组件
 
 Vue.use(Button);
@@ -27,3 +28,4 @@ Vue.use(Cell);
 Vue.use(CellGroup);
 Vue.use(Search);
 Vue.use(Tag);
+Vue.use(Loading);

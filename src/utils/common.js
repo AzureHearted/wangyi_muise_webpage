@@ -15,3 +15,28 @@ export function formatNumber(num = 0, rounding = 2) {
 	}
 	return str;
 }
+
+/** 防抖函数
+ * @param {Function} func 要进行防抖的函数
+ * @param {number} delay 防抖延时
+ * @returns {Function} 返回一个函数,执行该函数可以实现防抖
+ * @abstract
+ * 在delay期间内重复触发返回的这个函数,则一直重置计时器,
+ * 直到两次触发的间隔超过delay才能成功执行一次。
+ */
+export function debounce(func, delay = 500) {
+	// 声明全局变量timeout
+	let timeout;
+	// 返回一个函数(通过结构方法将所有变量传给args)
+	return function (...args) {
+		// 获取this的值
+		const context = this;
+		// 清除超时
+		clearTimeout(timeout);
+		// 设置超时
+		timeout = setTimeout(() => {
+			// 调用函数
+			func.apply(context, args);
+		}, delay);
+	};
+}

@@ -1,23 +1,26 @@
 <template>
-	<van-list v-model="loading" :finished="finished" @load="getList">
+	<div class="container">
+		<!-- 图标 -->
+		<div class="left" v-if="$slots.left">
+			<slot name="left"></slot>
+		</div>
 		<!-- 音乐项 -->
 		<van-cell
-			v-for="item in list"
-			:key="item.id"
 			title-class="title text-overflow"
 			label-class="label text-overflow">
 			<!-- 标题 -->
 			<template #title>
-				{{ item.name }}
-				<!-- 副标题 -->
-				<span>{{ item.song.alias | filterAlias }}</span>
+				<!-- 名称 -->
+				<span class="name">{{ name }}</span>
+				<!-- 别民 -->
+				<span class="alias">{{ alias | filterAlias }}</span>
 			</template>
 			<!-- 标签 -->
-			<template #label>
+			<template slot="label">
 				<!-- 图标SQ -->
-				<i class="icon-sq" v-if="item.song.sqMusic"></i>
+				<i class="icon-sq" v-if="isSqMusic"></i>
 				<!-- 标签内容 -->
-				{{ item.song.artists | filterArtists }}&nbsp;-&nbsp;{{ item.name }}
+				{{ artists | filterArtists }}&nbsp;-&nbsp;{{ name }}
 			</template>
 			<!-- 播放按钮 -->
 			<template #right-icon>
@@ -27,26 +30,24 @@
 				</div>
 			</template>
 		</van-cell>
-	</van-list>
+	</div>
 </template>
 
 <script>
-	/** 数据结构定义
-	 * @typedef {object} Data
-	 * @property {number} id id
-	 * @property {string} name 名称
-	 * @property {string} picUrl 图片路径
-	 * @property {SongInfo} song 歌曲详情
-	 *
-	 * @typedef {object} SongInfo 音乐信息 (数据结构)
-	 * @property {string[]} alias 别名
-	 * @property {Artist[]} artists 艺术家
-	 * @property {object} sqMusic SQ音乐信息(如果这个对象不为空则说明有SQ)
-	 *
-	 * @typedef {object} Artist 艺术家 (数据结构)
-	 * @property {string} name 名字/昵称
-	 */
 	export default {
+		props: {
+			// 音乐项数据，包含歌曲信息、艺术家信息等。
+			id: Number, // 音乐项的id
+			name: String, // 音乐项的名称
+			alias: Array, // 音乐项的别名，可能是一个数组。
+			artists: Array, // 音乐项的艺术家信息，可能是一个数组。
+			isSqMusic: Boolean, // 音乐项的SQ音乐信息
+			picUrl: {
+				type: String,
+				default: "", // 默认值为空字符串。
+			}, // 音乐项的图片路径。
+		},
+
 		filters: {
 			/** 处理艺术家信息
 			 * @param {Artist[]} val
@@ -61,46 +62,58 @@
 				return val.length > 0 ? `(${val.join()})` : "";
 			},
 		},
-		created() {
-			// this.getList();
-		},
-		methods: {
-			// 异步获取列表
-			async getList() {
-				// 调用 $api.latestMusic() 方法获取数据
-				let res = await this.$api.latestMusic();
-				console.log("最新音乐", res.data);
-				// 判断获取的数据是否成功
-				if (res.data?.code === 200) {
-					// 成功则将数据赋值给 list
-					this.list = res.data.result;
-					// 完成加载数据
-					this.finished = true;
-				}
-			},
-		},
+		created() {},
 		data() {
-			return {
-				/** @type {Data[]} */
-				list: [],
-				loading: false,
-				finished: false,
-			};
+			return {};
 		},
 	};
 </script>
 
 <style lang="less" scoped>
+	.container {
+		position: relative;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		padding-left: 10px;
+		box-sizing: border-box;
+		overflow: unset;
+	}
+	.left {
+		// box-sizing: border-box;
+		width: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-left: -10px;
+	}
 	// 最新音乐项
 	.van-cell {
-		padding: 6px 0 6px 10px;
+		flex: 1;
+		// position: relative;
 		cursor: pointer;
 		line-height: unset;
+		padding: unset;
+		padding: 6px 0;
 	}
+
+	.van-cell::after {
+		display: unset;
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 10;
+		border: 0 solid rgba(0, 0, 0, 0.1);
+		border-bottom-width: 1px;
+	}
+
 	// 标题
 	.title {
 		font-size: 17px;
-		span {
+		// 别名
+		.alias {
 			color: #888;
 		}
 	}
@@ -155,7 +168,7 @@
 		}
 	}
 	// 文字溢出样式
-	.text-overflow {
+	/deep/.text-overflow {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;

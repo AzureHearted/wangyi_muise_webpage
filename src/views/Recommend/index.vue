@@ -1,7 +1,7 @@
 <template>
 	<div class="container">
 		<TitleH2 content="编辑推荐" />
-		<EditorialRecommendation style="padding-bottom: 24px" />
+		<EditorialRecommend style="padding-bottom: 24px" />
 		<TitleH2 content="最新音乐" />
 		<LatestSongList />
 		<Footer />
@@ -9,13 +9,18 @@
 </template>
 
 <script>
-	import TitleH2 from "./TitleH2.vue";
-	import EditorialRecommendation from "./EditorialRecommendation.vue";
-	import LatestSongList from "./LatestSongList.vue";
-	import Footer from "./Footer.vue";
+	import TitleH2 from "./title-h2.vue";
+	import EditorialRecommend from "./editorial-recommend.vue";
+	import LatestSongList from "./latest-song-list.vue";
+	import Footer from "./footer.vue";
 
 	export default {
-		components: { TitleH2, EditorialRecommendation, LatestSongList, Footer },
+		components: {
+			TitleH2,
+			EditorialRecommend,
+			LatestSongList,
+			Footer,
+		},
 		data() {
 			return {};
 		},

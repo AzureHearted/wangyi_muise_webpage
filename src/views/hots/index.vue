@@ -8,15 +8,14 @@
 </template>
 
 <script>
-	import HotTop from "./HotTop.vue";
-	import TopList from "./TopList.vue";
+	import HotTop from "./hot-top.vue";
+	import TopList from "./top-list.vue";
 
 	export default {
 		components: {
 			HotTop,
 			TopList,
 		},
-
 		data() {
 			return {
 				/** @type {Data[]} */

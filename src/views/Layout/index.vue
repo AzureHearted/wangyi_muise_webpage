@@ -29,7 +29,7 @@
 </template>
 
 <script>
-	import TopDownload from "@/views/Layout/TopDownload"; // 导入顶部下载引导组件
+	import TopDownload from "./top-download"; // 导入顶部下载引导组件
 
 	export default {
 		components: { TopDownload },
@@ -79,46 +79,42 @@
 </script>
 
 <style lang="less" scoped>
-	.container {
-		.top-bar {
-			position: fixed;
-			width: 100%;
-			top: 0;
+	.top-bar {
+		position: fixed;
+		width: 100%;
+		top: 0;
+		left: 0;
+		z-index: 4;
+		// background: blue;
+		// background: transparent;
+		.van-tabs {
+			position: relative;
+		}
+		// 下方border
+		.van-tabs::after {
+			content: "";
+			position: absolute;
+			bottom: 0;
 			left: 0;
-			z-index: 4;
-			// background: blue;
-			// background: transparent;
-			.van-tabs {
-				position: relative;
+			right: 0;
+			border: 0 solid rgba(0, 0, 0, 0.1);
+			border-bottom-width: 1px;
+		}
+		/deep/.van-tabs__wrap {
+			height: 40px;
 
-				// 下方border
-				&::after {
-					content: "";
-					position: absolute;
-					bottom: 0px;
-					left: 0;
-					right: 0;
-					border: 0px solid rgba(0, 0, 0, 0.1);
-					border-bottom-width: 1px;
-				}
-
-				/deep/.van-tabs__wrap {
-					height: 40px;
-
-					.van-tab__text {
-						font-size: 15px;
-					}
-					// 修正激活时的标题字体
-					.van-tab--active {
-						font-weight: normal;
-					}
-				}
+			.van-tab__text {
+				font-size: 15px;
+			}
+			// 修正激活时的标题字体
+			.van-tab--active {
+				font-weight: normal;
 			}
 		}
-		.wrapper {
-			// padding-top: 124px;
-			// background: rgb(5, 106, 126);
-			// background: bisque;
-		}
+	}
+	.wrapper {
+		// padding-top: 124px;
+		// background: rgb(5, 106, 126);
+		// background: bisque;
 	}
 </style>
