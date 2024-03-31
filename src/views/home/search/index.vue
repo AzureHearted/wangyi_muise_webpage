@@ -8,7 +8,8 @@
 			shape="round"
 			autofocus
 			placeholder="搜索歌曲、歌手、专辑"
-			@click="getSearchSuggest" />
+			@click="getSearchSuggest"
+			@search="handleSearch" />
 		<!-- 热门搜索 -->
 		<SearchHotList
 			v-show="!(showSearchResult || showSearchSuggest)"
@@ -16,6 +17,8 @@
 		<!-- 搜索建议 -->
 		<SearchSuggest
 			ref="searchSuggest"
+			:loading="loading"
+			@update-loading="loading = $event"
 			:keywords="value"
 			v-show="showSearchSuggest && !showSearchResult"
 			@to-search="handleSearch" />
@@ -24,8 +27,9 @@
 			<!-- 搜索结果列表 -->
 			<BaseList
 				:list="searchResult"
-				v-model="loading"
 				:finished="finished"
+				v-model="loading"
+				none-text="暂无搜索结果"
 				@load="handleSearch(value)">
 				<template slot="custom" slot-scope="{ item }">
 					<!-- 音乐项定义 -->
@@ -34,10 +38,15 @@
 						:name="item.name"
 						:alias="item.alia"
 						:artists="item.ar"
-						:is-sq-music="!!item.sq" />
+						:is-sq-music="!!item.sq"
+						@click="toPlay(item.id)" />
+				</template>
+				<template #loading>
+					<span></span>
 				</template>
 			</BaseList>
 		</div>
+		<Loading fixed v-show="loading" />
 	</div>
 </template>
 
@@ -46,9 +55,10 @@
 	import MusicItem from "@/components/music-item.vue";
 	import SearchHotList from "./search-hot-list.vue";
 	import SearchSuggest from "./search-suggest.vue";
+	import Loading from "@/components/loading.vue";
 
 	export default {
-		components: { SearchHotList, SearchSuggest, BaseList, MusicItem },
+		components: { SearchHotList, SearchSuggest, BaseList, MusicItem, Loading },
 		directives: {
 			// 自定义指令：自动获取焦点
 			focus: {
@@ -73,6 +83,7 @@
 				finished: false, // 是否加载完成
 			};
 		},
+		computed: {},
 		watch: {
 			// 监听搜索框内容变化
 			value(newVal) {
@@ -99,12 +110,12 @@
 			 * @param {string} keywords 关键词
 			 */
 			async handleSearch(keywords) {
-				this.loading = true;
 				// 判断搜索框内容是否为空
 				if (!keywords) return;
+				// console.log("加载搜索结果……");
+				this.loading = true;
 				this.value = keywords;
 				this.showSearchResult = true;
-				console.log("加载搜索结果……");
 				// 发送请求
 				let res = await this.$api.searchMusic({
 					keywords,
@@ -113,15 +124,18 @@
 				});
 				console.log("搜索音乐", res.data);
 				// 判断是否成功
-				if (res.data.code === 200) {
+				if (res.data.code === 200 && res.data.result.songs) {
 					this.searchResult.push(...res.data?.result?.songs);
 					this.total = res.data?.result?.songCount;
-					console.log(this.total, this.searchResult);
-					this.loading = false;
+					// console.log(this.total, this.searchResult);
+					// this.changeLoading(false);
 					if (this.searchResult.length >= this.total) {
 						this.finished = true;
 					}
+				} else {
+					this.finished = true;
 				}
+				this.loading = false;
 			},
 			// 重置搜索结果
 			resetSearchResult() {
@@ -132,6 +146,11 @@
 				this.page = 1;
 				this.total = 0;
 				this.finished = false;
+			},
+			// 转到播放页面
+			toPlay(id) {
+				console.log("转到播放页面", id);
+				this.$router.push({ name: "player", params: { id } });
 			},
 		},
 	};

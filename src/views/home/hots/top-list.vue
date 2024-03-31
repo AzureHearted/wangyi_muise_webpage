@@ -1,35 +1,50 @@
 <template>
-	<BaseList :list="list" v-model="loading" :finished="finished" @load="getList">
-		<!-- 列表内容区 -->
-		<template slot="custom" slot-scope="{ item, index }">
-			<!-- 音乐项 -->
-			<MusicItem
-				:id="item.id"
-				:name="item.name"
-				:alias="item.alia"
-				:artists="item.ar"
-				:is-sq-music="!!item.sq">
-				<template slot="left">
-					<!-- 排名 -->
-					<span class="rank">
-						{{ (index + 1).toString().padStart(2, "0") }}
-					</span>
-				</template>
-			</MusicItem>
-		</template>
-		<!-- 列表底部 -->
-		<template slot="footer">
-			<!-- 完整榜单按钮 -->
-			<div class="hotdn">
-				<span class="hotview">查看完整榜单</span>
-			</div>
-		</template>
-	</BaseList>
+	<div>
+		<BaseList
+			:list="list"
+			v-model="loading"
+			:finished="finished"
+			@load="getList">
+			<!-- 列表内容区 -->
+			<template slot="custom" slot-scope="{ item, index }">
+				<!-- 音乐项 -->
+				<MusicItem
+					key="item.id"
+					:id="item.id"
+					:name="item.name"
+					:alias="item.alia"
+					:artists="item.ar"
+					:is-sq-music="!!item.sq"
+					@click="toPlay(item.id)">
+					<template slot="left">
+						<!-- 排名 -->
+						<span class="rank">
+							{{ (index + 1).toString().padStart(2, "0") }}
+						</span>
+					</template>
+				</MusicItem>
+			</template>
+			<!-- 列表底部 -->
+			<template #footer>
+				<!-- 完整榜单按钮 -->
+				<div class="hotdn" v-show="!loading">
+					<span class="hotview">查看完整榜单</span>
+				</div>
+			</template>
+			<template #loading>
+				<!-- 去除原始加载样式 -->
+				<span></span>
+			</template>
+		</BaseList>
+		<Loading fixed v-show="loading" />
+	</div>
 </template>
 
 <script>
 	import BaseList from "@/components/base-list.vue";
 	import MusicItem from "@/components/music-item.vue";
+	import Loading from "@/components/loading.vue";
+	import { mapState, mapMutations } from "vuex";
 
 	/** 数据结构定义
 	 * @typedef {object} Data
@@ -48,29 +63,40 @@
 		components: {
 			BaseList,
 			MusicItem,
+			Loading,
+		},
+		data() {
+			return {
+				/** @type {Data[]} */
+				list: [], // 列表数据
+				finished: false,
+			};
+		},
+		computed: {
+			...mapState("layout", ["loading"]),
 		},
 		methods: {
+			...mapMutations("layout", ["changeLoading"]),
 			// 异步获取列表
 			async getList() {
+				this.changeLoading(true); // 开始加载数据 (vuex 状态管理)
 				// 调用 $api.latestMusic() 方法获取数据
 				let res = await this.$api.hotSinglesChart();
 				console.log("热歌榜", res.data);
 				// 判断获取的数据是否成功
 				if (res.data?.code === 200) {
 					// 成功则将数据赋值给 list
-					this.list = res.data?.playlist?.tracks;
+					this.list = res.data.playlist.tracks.slice(0, 20);
 					// 完成加载数据
 					this.finished = true;
+					this.changeLoading(false);
 				}
 			},
-		},
-		data() {
-			return {
-				/** @type {Data[]} */
-				list: [], // 列表数据
-				loading: false,
-				finished: false,
-			};
+			// 转到播放页面
+			toPlay(id) {
+				console.log("转到播放页面", id);
+				this.$router.push({ name: "player", params: { id } });
+			},
 		},
 	};
 </script>

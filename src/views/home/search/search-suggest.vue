@@ -10,7 +10,7 @@
 			@header-click="handleClick(keywords)">
 			<!-- 在头部插入搜索提示区域 -->
 			<template slot="header">
-				<span>搜索“{{ keywords }}”</span>
+				<div class="header">搜索“{{ keywords }}”</div>
 			</template>
 			<!-- 传入每条数据的图标 -->
 			<template slot="item-icon">
@@ -28,12 +28,24 @@
 	export default {
 		components: { BaseList },
 		props: {
+			loading: Boolean, // 是否正在加载
 			keywords: String, // 搜索关键词
 		},
 		data() {
 			return {
 				suggestList: [], // 搜索建议
 			};
+		},
+		computed: {
+			theLoading: {
+				get() {
+					return this.loading; // 返回父组件传递的loading状态。
+				},
+				set(value) {
+					// 更新v-model绑定的属性
+					this.$emit("update-loading", value);
+				},
+			},
 		},
 		watch: {
 			keywords(newVal, oldVal) {
@@ -60,6 +72,7 @@
 			async getSearchSuggest() {
 				// 判断搜索框内容是否为空
 				if (!this.keywords) return;
+				this.theLoading = true; // 开始加载状态
 				// 发送请求
 				let res = await this.$api.searchSuggest({
 					keywords: this.keywords,
@@ -75,6 +88,8 @@
 						this.suggestList = []; // 如果没有搜索建议，则清空列表
 					}
 				}
+				// 结束加载状态
+				this.theLoading = false;
 			},
 			// 点击搜索建议
 			handleClick(value) {
@@ -87,5 +102,9 @@
 <style lang="less" scoped>
 	.search-suggest {
 		padding-left: 10px;
+	}
+	.header {
+		height: 50px;
+		line-height: 50px;
 	}
 </style>

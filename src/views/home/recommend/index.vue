@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="recommend-container">
 		<TitleH2 content="编辑推荐" />
 		<EditorialRecommend style="padding-bottom: 24px" />
 		<TitleH2 content="最新音乐" />
@@ -28,7 +28,7 @@
 </script>
 
 <style lang="less" scoped>
-	.container {
+	.recommend-container {
 		padding-top: 20px;
 		// background: wheat;
 	}

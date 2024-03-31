@@ -1,16 +1,21 @@
 <template>
-	<div class="remd_ul">
-		<div class="remd_li" v-for="(item, index) in list" :key="index">
+	<div class="remd-list">
+		<div
+			class="remd-card"
+			v-for="(item, index) in list"
+			:key="index"
+			@click="toPlaylist(item.id)">
 			<!-- 音乐封面 -->
-			<div class="remd_img">
-				<img class="u-img" :src="item.picUrl" />
+			<div class="remd-info">
+				<!-- 封面图片 -->
+				<img class="remd-img" :src="item.picUrl" />
 				<!-- 播放量 & 耳机图标 -->
-				<span class="u-earp remd_lnum"
+				<span class="icon-earphone remd-play-num"
 					>{{ item.playCount | countFormat }}
 				</span>
 			</div>
 			<!-- 描述 -->
-			<p class="remd_text">{{ item.name }}</p>
+			<p class="remd-text">{{ item.name }}</p>
 		</div>
 	</div>
 </template>
@@ -25,6 +30,12 @@
 	 * @property {number} playCount 播放量
 	 */
 	export default {
+		data() {
+			return {
+				/** @type {Data[]} */
+				list: [],
+			};
+		},
 		filters: {
 			/**  格式化数量
 			 * @param {number} value
@@ -44,23 +55,23 @@
 					this.list = res.data.result;
 				}
 			},
-		},
-		data() {
-			return {
-				/** @type {Data[]} */
-				list: [],
-			};
+			// 转到歌单
+			toPlaylist(id) {
+				console.log("转到歌单", id);
+				// this.$router.push({ name: "player", params: { id } });
+			},
 		},
 	};
 </script>
 
 <style lang="less" scoped>
 	// 推荐卡片容器
-	.remd_ul {
+	.remd-list {
+		position: relative;
 		display: flex;
 		flex-wrap: wrap;
 		// 推荐卡片
-		.remd_li {
+		.remd-card {
 			// flex: 0;
 			width: 33.3%;
 			// background: orange;
@@ -86,11 +97,11 @@
 			}
 
 			// 图片容器
-			.remd_img {
+			.remd-info {
 				// 设置相对定位(给容器内的img作为参考)
 				position: relative;
 				padding-bottom: 100%;
-				& > .u-img {
+				& > .remd-img {
 					position: absolute;
 					width: 100%;
 					left: 0;
@@ -98,7 +109,7 @@
 					z-index: 1;
 				}
 				// 播放量
-				.remd_lnum {
+				.remd-play-num {
 					position: absolute;
 					right: 5px;
 					top: 2px;
@@ -111,7 +122,7 @@
 					background-size: 11px 10px;
 					text-shadow: 1px 0 0 rgba(0, 0, 0, 0.15);
 					// 图标svg
-					&.u-earp {
+					&.icon-earphone {
 						background-image: url("@/assets/svg/headset.svg");
 					}
 				}
@@ -138,7 +149,7 @@
 			}
 
 			// 描述
-			.remd_text {
+			.remd-text {
 				display: -webkit-box;
 				-webkit-line-clamp: 2;
 				-webkit-box-orient: vertical;

@@ -29,6 +29,16 @@
 		<footer class="footer" v-if="$slots.footer" @click="handleFooterClick">
 			<slot name="footer" :item="list"></slot>
 		</footer>
+		<!-- 没有元素时显示 -->
+		<slot name="none" v-if="finished && noneText && !list.length">
+			<div class="none">
+				{{ noneText }}
+			</div>
+		</slot>
+		<!-- van-list中的插槽传递 -->
+		<slot name="loading" slot="loading"></slot>
+		<slot name="finished" slot="finished"></slot>
+		<slot name="error" slot="error"></slot>
 	</van-list>
 </template>
 
@@ -71,28 +81,13 @@
 				type: [Number, String],
 				default: "auto",
 			},
+			noneText: {
+				type: String,
+				default: "",
+			},
 		},
-		methods: {
-			// 处理加载更多事件
-			getList() {
-				this.$emit("load");
-			},
-			// 处理列表项点击事件
-			handleClick(item) {
-				// 触发item-click事件
-				console.log("base-list --> item-click", item[this.contentProp], item);
-				this.$emit("item-click", item[this.contentProp], item);
-			},
-			// 处理头部点击事件
-			handleHeaderClick() {
-				console.log("base-list --> header-click");
-				this.$emit("header-click");
-			},
-			// 处理尾部点击事件
-			handleFooterClick() {
-				console.log("base-list --> footer-click");
-				this.$emit("footer-click");
-			},
+		data() {
+			return {};
 		},
 		computed: {
 			// 列表项样式
@@ -120,12 +115,31 @@
 		},
 		created() {
 			this.$nextTick(() => {
-				console.log("base-list --> $slots", this.$slots);
+				// console.log("base-list --> $slots", this.$slots);
 			});
 		},
-
-		data() {
-			return {};
+		methods: {
+			// 处理加载更多事件
+			getList() {
+				// console.log('加载更多');
+				this.$emit("load");
+			},
+			// 处理列表项点击事件
+			handleClick(item) {
+				// 触发item-click事件
+				// console.log("base-list --> item-click", item[this.contentProp], item);
+				this.$emit("item-click", item[this.contentProp], item);
+			},
+			// 处理头部点击事件
+			handleHeaderClick() {
+				// console.log("base-list --> header-click");
+				this.$emit("header-click");
+			},
+			// 处理尾部点击事件
+			handleFooterClick() {
+				// console.log("base-list --> footer-click");
+				this.$emit("footer-click");
+			},
 		},
 	};
 </script>
@@ -187,11 +201,19 @@
 	.header,
 	.footer {
 		position: relative;
-		height: 50px;
-		line-height: 50px;
+		// height: 50px;
+		// line-height: 50px;
 	}
 	.header {
 		color: #507daf;
 		font-size: var(--font-size);
+	}
+	// 没有结果时显示的文本样式
+	.none {
+		height: 61px;
+		padding: 20px 0;
+		font-size: 14px;
+		text-align: center;
+		color: #333;
 	}
 </style>

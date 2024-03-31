@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="container" @click="$emit('click')">
 		<!-- 图标 -->
 		<div class="left" v-if="$slots.left">
 			<slot name="left"></slot>
@@ -12,7 +12,7 @@
 			<template #title>
 				<!-- 名称 -->
 				<span class="name">{{ name }}</span>
-				<!-- 别民 -->
+				<!-- 别名 -->
 				<span class="alias">{{ alias | filterAlias }}</span>
 			</template>
 			<!-- 标签 -->
@@ -49,15 +49,11 @@
 		},
 
 		filters: {
-			/** 处理艺术家信息
-			 * @param {Artist[]} val
-			 */
+			/** 处理艺术家信息 */
 			filterArtists(val) {
 				return val.map((a) => a.name).join(" / ");
 			},
-			/** 处理别名
-			 * @param {string[]} val
-			 */
+			/** 处理别名 */
 			filterAlias(val) {
 				return val.length > 0 ? `(${val.join()})` : "";
 			},

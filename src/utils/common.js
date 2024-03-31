@@ -40,3 +40,62 @@ export function debounce(func, delay = 500) {
 		}, delay);
 	};
 }
+
+// 计算颜色亮度
+function getBrightness(rgbColor) {
+	// 根据 RGB 值计算亮度，常用的一种计算方法是将 RGB 值分别乘以不同的权重
+	return 0.299 * rgbColor[0] + 0.587 * rgbColor[1] + 0.114 * rgbColor[2];
+}
+
+// 获取亮度最高、最低、中间色三种颜色
+export function findExtremeColorsByBrightness(colors) {
+	let brightestIndex = 0;
+	let darkestIndex = 0;
+	let maxBrightness = getBrightness(colors[0]);
+	let minBrightness = getBrightness(colors[0]);
+
+	// 遍历数组，找到最亮和最暗的颜色
+	for (let i = 1; i < colors.length; i++) {
+		const brightness = getBrightness(colors[i]);
+		if (brightness > maxBrightness) {
+			maxBrightness = brightness;
+			brightestIndex = i;
+		} else if (brightness < minBrightness) {
+			minBrightness = brightness;
+			darkestIndex = i;
+		}
+	}
+
+	// 找到中间颜色
+	let middleIndex = 0;
+	let middleBrightness = Infinity;
+	for (let i = 0; i < colors.length; i++) {
+		if (i !== brightestIndex && i !== darkestIndex) {
+			const brightness = getBrightness(colors[i]);
+			if (Math.abs(brightness - maxBrightness) < middleBrightness) {
+				middleBrightness = Math.abs(brightness - maxBrightness);
+				middleIndex = i;
+			}
+		}
+	}
+
+	return {
+		high: colors[brightestIndex],
+		low: colors[darkestIndex],
+		middle: colors[middleIndex],
+	};
+}
+
+// 示例用法
+// const colors = [
+// 	[255, 255, 255], // 白色
+// 	[0, 0, 0], // 黑色
+// 	[255, 0, 0], // 红色
+// 	[0, 255, 0], // 绿色
+// 	[0, 0, 255], // 蓝色
+// ];
+
+// const extremeColors = findExtremeColors(colors);
+// console.log("最亮的颜色：", extremeColors.brightest);
+// console.log("最暗的颜色：", extremeColors.darkest);
+// console.log("中间的颜色：", extremeColors.middle);
